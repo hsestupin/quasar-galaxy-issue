@@ -1,0 +1,19 @@
+allprojects {
+  apply plugin: 'java'
+  apply plugin: 'application'
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    compile "co.paralleluniverse:quasar-core:$QUASAR_VERSION:jdk8"
+    compile "co.paralleluniverse:quasar-actors:$QUASAR_VERSION"
+    compile "co.paralleluniverse:quasar-galaxy:$QUASAR_VERSION"
+    compile "co.paralleluniverse:quasar-galaxy:$QUASAR_VERSION"
+
+    compile "co.paralleluniverse:galaxy:$GALAXY_VERSION"
+
+    compile "org.apache.curator:curator-test:$APACHE_CURATOR_VERSION"
+  }
+}

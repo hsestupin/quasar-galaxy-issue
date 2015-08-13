@@ -1,0 +1,21 @@
+# Gradle
+.gradle
+build
+*/build/
+*/war/
+
+# Idea
+.idea/
+classes
+*.iml
+*.ipr
+*.iws
+out
+generated
+generated_proto
+generated_tests
+
+# QA
+pitest
+target
+QA*.xml

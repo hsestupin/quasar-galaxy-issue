@@ -1,0 +1,4 @@
+run {
+    classpath += sourceSets.test.runtimeClasspath
+    mainClassName = "issue.Example1"
+}
