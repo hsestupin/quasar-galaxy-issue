@@ -51,7 +51,9 @@ public class Example2 {
         throw new AssertionError();
       }
 
-      log.error("FIRST ISSUE", issue);
+      log.error("SECOND ISSUE", issue);
+
+      grid.cluster().goOffline();
     }
   }
 

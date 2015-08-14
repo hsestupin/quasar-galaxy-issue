@@ -1,4 +1,6 @@
 run {
-    classpath += sourceSets.test.runtimeClasspath
-    mainClassName = "issue.Example1"
+  classpath += sourceSets.test.runtimeClasspath
+  mainClassName = "issue.Example1"
+  applicationDefaultJvmArgs = ["-Dco.paralleluniverse.debugMode=true",
+                               "-Dco.paralleluniverse.globalFlightRecorder=true"]
 }

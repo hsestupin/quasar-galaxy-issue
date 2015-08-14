@@ -1,16 +1,16 @@
 package issue;
 
+import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
-import co.paralleluniverse.actors.BasicActor;
-import co.paralleluniverse.actors.behaviors.RequestMessage;
-import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
+import co.paralleluniverse.actors.behaviors.Behavior;
+import co.paralleluniverse.actors.behaviors.BehaviorActor;
+import co.paralleluniverse.common.monitoring.FlightRecorder;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.galaxy.Grid;
 import org.apache.curator.test.TestingServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ObjectStreamException;
 import java.util.Properties;
 
 /**
@@ -34,47 +34,36 @@ public class Example1 {
       final Grid grid = Grid.getInstance(null, props);
       grid.goOnline();
 
-
       final MyActor actor = new MyActor();
-      actor.spawnThread();
+      final Behavior localRef = actor.spawnThread();
       actor.register(ACTOR_NAME);
 
-      ActorRegistry.getActor(ACTOR_NAME);
+      final ActorRef<Object> globalRef = ActorRegistry.getActor(ACTOR_NAME);
+      globalRef.send(localRef);
 
-      Throwable issue = null;
-      try {
-        actor.runFail();
-      } catch (Throwable th) {
-        issue = th;
-      }
-      if (issue == null) {
-        throw new AssertionError();
-      }
+      actor.printRecords();
 
-      log.error("FIRST ISSUE", issue);
+      localRef.shutdown();
+      grid.cluster().goOffline();
     }
   }
 
-  public static class MyActor extends BasicActor<HelloMessage, Void> {
+  public static class MyActor extends BehaviorActor {
+
+    public void printRecords() {
+      for (FlightRecorder.Record record : flightRecorder.getRecords()) {
+        System.out.println(record);
+      }
+    }
 
     @Override
-    protected Void doRun() throws InterruptedException, SuspendExecution {
-      final HelloMessage message = receive();
+    protected void handleMessage(Object message) throws InterruptedException, SuspendExecution {
       System.out.println("Message received '" + message + '\'');
-      RequestReplyHelper.reply(message, 1);
-      return null;
     }
-
-    public void runFail() throws ObjectStreamException {
-      writeReplace();
-    }
-  }
-
-  public static class HelloMessage extends RequestMessage<Integer> {
 
     @Override
-    public String toString() {
-      return "Hello!";
+    public Logger log() {
+      return LoggerFactory.getLogger(MyActor.class);
     }
   }
 
